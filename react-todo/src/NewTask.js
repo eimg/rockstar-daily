@@ -1,18 +1,12 @@
 import { useRef } from "react";
-
-import {
-	TextField,
-	IconButton,
-} from "@mui/material";
-
-import {
-	Add as AddIcon
-} from "@mui/icons-material";
+import { OutlinedInput, IconButton, InputAdornment } from "@mui/material";
+import { Add as AddIcon } from "@mui/icons-material";
+import { green } from "@mui/material/colors";
 
 export default function NewTask({ add }) {
-	const input = useRef();
+    const input = useRef();
 
-	return (
+    return (
         <form
             onSubmit={(e) => {
                 e.preventDefault();
@@ -26,13 +20,19 @@ export default function NewTask({ add }) {
                 input.current.focus();
             }}
         >
-            <TextField
-				placeholder="Enter task"
-				inputRef={input}
-			/>
-            <IconButton>
-				<AddIcon />
-			</IconButton>
+            <OutlinedInput
+                color="error"
+                fullWidth
+                placeholder="Enter task"
+                inputRef={input}
+                endAdornment={
+                    <InputAdornment position="end">
+                        <IconButton type="submit">
+                            <AddIcon sx={{ color: green[500] }} />
+                        </IconButton>
+                    </InputAdornment>
+                }
+            />
         </form>
     );
 }

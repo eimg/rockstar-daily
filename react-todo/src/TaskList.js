@@ -1,19 +1,47 @@
+import { Box, List, ListItem, ListItemText, IconButton } from "@mui/material";
+
+import {
+    Delete as DeleteIcon,
+    Check as CheckIcon,
+    Undo as UndoIcon,
+    Edit as EditIcon,
+} from "@mui/icons-material";
+
+import { pink, green } from "@mui/material/colors";
+
+import { Link } from "react-router-dom";
 export default function TaskList({ items, remove, toggle }) {
     return (
-        <ul>
+        <Box>
             {items.map((item) => {
                 return (
-                    <li key={item.id} style={{
-						color: item.done ? "grey" : "black"
-					}}>
-                        <button onClick={() => remove(item.id)}>Del</button>
-                        <button onClick={() => toggle(item.id)}>
-                            {item.done ? "Undo" : "Done"}
-                        </button>
-                        {item.subject}
-                    </li>
+                    <List key={item.id}>
+                        <ListItem>
+                            <IconButton onClick={() => toggle(item.id)}>
+                                {item.done ? (
+                                    <UndoIcon />
+                                ) : (
+                                    <CheckIcon sx={{ color: green[500] }} />
+                                )}
+                            </IconButton>
+                            <ListItemText
+                                sx={{
+                                    ml: 3,
+                                    color: item.done ? "grey" : "black",
+                                }}
+                            >
+                                {item.subject}
+                            </ListItemText>
+                            <Link to={`/edit/${item.id}`}>
+                                <EditIcon sx={{ color: "grey", mr: 2 }} />
+                            </Link>
+                            <IconButton onClick={() => remove(item.id)}>
+                                <DeleteIcon sx={{ color: pink[500] }} />
+                            </IconButton>
+                        </ListItem>
+                    </List>
                 );
             })}
-        </ul>
+        </Box>
     );
 }
