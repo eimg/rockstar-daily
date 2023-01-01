@@ -4,25 +4,19 @@ import TaskList from "./TaskList";
 import NewTask from "./NewTask";
 import Edit from "./Edit";
 
-import { 
-    Box, 
-    Button, 
-    AppBar, 
-    Toolbar, 
-    Typography, 
-    Container, 
+import {
+    Box,
+    Button,
+    AppBar,
+    Toolbar,
+    Typography,
+    Container,
     Divider,
 } from "@mui/material";
 
-import {
-    pink
-} from "@mui/material/colors";
+import { pink } from "@mui/material/colors";
 
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-} from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 export default function App() {
     const [items, setItems] = useState([
@@ -30,6 +24,10 @@ export default function App() {
         { id: 2, subject: "Apple", done: true },
         { id: 3, subject: "Bread", done: false },
     ]);
+
+    const get = (id) => {
+        return items.filter((item) => item.id === parseInt(id))[0];
+    };
 
     const add = (subject) => {
         setItems([{ id: items.length + 1, subject, done: false }, ...items]);
@@ -40,11 +38,13 @@ export default function App() {
     };
 
     const update = (id, subject) => {
-        setItems(items.map(item => {
-            if(item.id === id) item.subject = subject;
-            return item;
-        }));
-    }
+        setItems(
+            items.map((item) => {
+                if (item.id === parseInt(id)) item.subject = subject;
+                return item;
+            })
+        );
+    };
 
     const toggle = (id) => {
         const result = items.map((item) => {
@@ -55,9 +55,9 @@ export default function App() {
         setItems(result);
     };
 
-	const clear = () => {
-		setItems( items.filter(item => !item.done) );
-	}
+    const clear = () => {
+        setItems(items.filter((item) => !item.done));
+    };
 
     return (
         <Box>
@@ -79,31 +79,32 @@ export default function App() {
                 </AppBar>
             </Box>
 
-            <Router>
-                <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            <Container maxWidth="sm" sx={{ mt: 4 }}>
-                                <NewTask add={add} />
+            <Routes>
+                <Route
+                    path="/"
+                    element={
+                        <Container maxWidth="sm" sx={{ mt: 4 }}>
+                            <NewTask add={add} />
 
-                                <TaskList
-                                    items={items.filter((item) => !item.done)}
-                                    remove={remove}
-                                    toggle={toggle}
-                                />
-                                <Divider />
-                                <TaskList
-                                    items={items.filter((item) => item.done)}
-                                    remove={remove}
-                                    toggle={toggle}
-                                />
-                            </Container>
-                        }
-                    />
-                    <Route path="/edit/:id" element={<Edit />} />
-                </Routes>
-            </Router>
+                            <TaskList
+                                items={items.filter((item) => !item.done)}
+                                remove={remove}
+                                toggle={toggle}
+                            />
+                            <Divider />
+                            <TaskList
+                                items={items.filter((item) => item.done)}
+                                remove={remove}
+                                toggle={toggle}
+                            />
+                        </Container>
+                    }
+                />
+                <Route
+                    path="/edit/:id"
+                    element={<Edit get={get} update={update} />}
+                />
+            </Routes>
         </Box>
     );
 }
