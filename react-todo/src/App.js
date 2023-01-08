@@ -1,15 +1,34 @@
-import { useState, createContext } from "react";
+import { useState, createContext, useContext } from "react";
+
+import {
+	Box,
+	Button,
+	AppBar,
+	Toolbar,
+	Divider,
+	useTheme,
+	IconButton,
+} from "@mui/material";
+
+import {
+	LightMode as LightModeIcon,
+	DarkMode as DarkModeIcon,
+} from "@mui/icons-material";
+
+import { pink } from "@mui/material/colors";
+import { Routes, Route } from "react-router-dom";
+import { ModeContext } from "./ThemedApp";
+
 import TaskList from "./TaskList";
 import NewTask from "./NewTask";
 import Edit from "./Edit";
 import Title from "./Title";
-import { Box, Button, AppBar, Toolbar, Divider, } from "@mui/material";
-import { pink } from "@mui/material/colors";
-import { Routes, Route } from "react-router-dom";
 
 export const CountContext = createContext(0);
 
 export default function App() {
+	const theme = useTheme();
+
 	const [items, setItems] = useState([
 		{ id: 1, subject: "Egg", done: false },
 		{ id: 2, subject: "Apple", done: true },
@@ -50,6 +69,8 @@ export default function App() {
 		setItems(items.filter(item => !item.done));
 	};
 
+	const changeMode = useContext(ModeContext);
+
 	return (
 		<CountContext.Provider value={items.length}>
 			<Box>
@@ -60,6 +81,22 @@ export default function App() {
 							<Button color="inherit" onClick={clear}>
 								Clear
 							</Button>
+
+							{theme.palette.mode === "dark" ? (
+								<IconButton
+									onClick={() => {
+										changeMode();
+									}}>
+									<LightModeIcon />
+								</IconButton>
+							) : (
+								<IconButton
+									onClick={() => {
+										changeMode();
+									}}>
+									<DarkModeIcon />
+								</IconButton>
+							)}
 						</Toolbar>
 					</AppBar>
 				</Box>
