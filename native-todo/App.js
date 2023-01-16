@@ -1,150 +1,51 @@
 import { useState } from "react";
-import { View, Text, Button, TextInput } from "react-native";
+import { View, TouchableOpacity } from "react-native";
+import {
+	ThemeProvider,
+	Button,
+	createTheme,
+	Badge,
+	Text,
+	useTheme,
+	useThemeMode,
+} from "@rneui/themed";
 
-import { NavigationContainer, useNavigation, useRoute } from "@react-navigation/native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
+import List from "./List";
+import Edit from "./Edit";
+
+import {
+	NavigationContainer,
+	DefaultTheme,
+	DarkTheme,
+} from "@react-navigation/native";
+
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Stack = createNativeStackNavigator();
 
+const rneTheme = createTheme({
+	mode: "dark",
+});
+
 export default function NavigatedApp() {
+	const [navMode, setNavMode] = useState("dark");
+
 	return (
-		<NavigationContainer>
-			<App />
+		<NavigationContainer
+			theme={navMode === "dark" ? DarkTheme : DefaultTheme}>
+			<ThemeProvider theme={rneTheme}>
+				<App setNavMode={setNavMode} />
+			</ThemeProvider>
 		</NavigationContainer>
 	);
 }
 
-function List({ items, setItems }) {
-	const navigation = useNavigation();
-	const [input, setInput] = useState("");
+function App({ setNavMode }) {
+	const { theme } = useTheme();
+	const { mode, setMode } = useThemeMode();
 
-	return (
-		<View style={{ padding: 20, width: 500 }}>
-			<TextInput onChangeText={setInput} value={input} />
-			<Button
-				title="Add"
-				onPress={() => {
-					setItems([
-						{ id: items.length + 1, subject: input, done: false },
-						...items,
-					]);
-
-					setInput("");
-				}}
-			/>
-
-			{items
-				.filter(item => !item.done)
-				.map(item => {
-					return (
-						<View
-							key={item.id}
-							style={{
-								borderBottomWidth: 1,
-								padding: 10,
-								flexDirection: "row",
-								alignItems: "center",
-							}}>
-							<Button
-								title="Del"
-								onPress={() => {
-									setItems(
-										items.filter(i => i.id !== item.id),
-									);
-								}}
-							/>
-
-							<Button
-								title="Done"
-								onPress={() => {
-									setItems(
-										items.map(i => {
-											if(i.id === item.id) i.done = true;
-											return i;
-										})
-									);
-								}}
-							/>
-
-							<Button title="Edit" onPress={() => {
-								navigation.navigate("Edit", {
-									subject: item.subject,
-									id: item.id,
-								})
-							}} />
-
-							<Text style={{ marginLeft: 20 }}>
-								{item.subject}
-							</Text>
-						</View>
-					);
-				})}
-
-			<View style={{ paddingTop: 20, marginTop: 20, borderTopWidth: 2 }}>
-				{items
-					.filter(item => item.done)
-					.map(item => {
-						return (
-							<View
-								key={item.id}
-								style={{
-									borderBottomWidth: 1,
-									padding: 10,
-									flexDirection: "row",
-									alignItems: "center",
-								}}>
-								<Button
-									title="Del"
-									onPress={() => {
-										setItems(
-											items.filter(i => i.id !== item.id),
-										);
-									}}
-								/>
-
-								<Button
-									title="Undo"
-									onPress={() => {
-										setItems(
-											items.map(i => {
-												if (i.id === item.id)
-													i.done = false;
-												return i;
-											}),
-										);
-									}}
-								/>
-
-								<Text style={{ marginLeft: 20 }}>
-									{item.subject}
-								</Text>
-							</View>
-						);
-					})}
-			</View>
-		</View>
-	);
-}
-
-function Edit({ update }) {
-	const route = useRoute();
-	const navigation = useNavigation();
-
-	const { subject, id } = route.params;
-	const [ input, setInput ] = useState(subject);
-
-	return (
-		<View style={{ padding: 20, width: 500 }}>
-			<TextInput value={input} onChangeText={setInput} defaultValue={subject} />
-			<Button title="Update" onPress={() => {
-				update(id, input);
-				navigation.navigate("List");
-			}} />
-		</View>
-	);
-}
-
-function App() {
 	const [items, setItems] = useState([
 		{ id: 1, subject: "Egg", done: false },
 		{ id: 2, subject: "Apple", done: true },
@@ -152,19 +53,65 @@ function App() {
 	]);
 
 	const update = (id, subject) => {
-		setItems(items.map(item => {
-			if(item.id === id) item.subject = subject;
-			return item;
-		}));
-	}
+		setItems(
+			items.map(item => {
+				if (item.id === id) item.subject = subject;
+				return item;
+			}),
+		);
+	};
 
 	return (
 		<Stack.Navigator>
-			<Stack.Screen name="List">
+			<Stack.Screen
+				name="List"
+				options={{
+					headerTitle: () => (
+						<View style={{ flexDirection: "row" }}>
+							<Text
+								style={{
+									fontSize: 16,
+									fontWeight: "Bold",
+									marginRight: 10,
+								}}>
+								Todo List
+							</Text>
+							<Badge
+								value={items.filter(i => !i.done).length}
+								status="error"
+							/>
+						</View>
+					),
+					headerRight: () => (
+						<View style={{ marginRight: 30 }}>
+							<TouchableOpacity
+								onPress={() => {
+									setMode(mode === "dark" ? "light" : "dark");
+									setNavMode(
+										mode === "dark" ? "light" : "dark",
+									);
+								}}>
+								{mode === "dark" ? (
+									<Ionicons
+										name="sunny"
+										size={24}
+										color={theme.colors.black}
+									/>
+								) : (
+									<Ionicons
+										name="moon"
+										size={24}
+										color={theme.colors.black}
+									/>
+								)}
+							</TouchableOpacity>
+						</View>
+					),
+				}}>
 				{() => <List items={items} setItems={setItems} />}
 			</Stack.Screen>
 			<Stack.Screen name="Edit">
-				{ () => <Edit update={update} /> }
+				{() => <Edit update={update} />}
 			</Stack.Screen>
 		</Stack.Navigator>
 	);
