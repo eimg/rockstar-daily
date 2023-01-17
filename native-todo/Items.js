@@ -6,7 +6,7 @@ import { ListItem, Text, useTheme } from "@rneui/themed";
 
 import { useNavigation } from "@react-navigation/native";
 
-export default function Items({ items, setItems }) {
+export default function Items({ items, setItems, toggleDone }) {
 	const navigation = useNavigation();
 	const { theme } = useTheme();
 
@@ -14,39 +14,21 @@ export default function Items({ items, setItems }) {
 		return (
 			<View key={item.id}>
 				<ListItem>
-					{item.done ? (
-						<TouchableOpacity
-							onPress={() => {
-								setItems(
-									items.map(i => {
-										if (i.id === item.id) i.done = false;
-										return i;
-									}),
-								);
-							}}>
+					<TouchableOpacity onPress={() => toggleDone(item.id)}>
+						{item.done ? (
 							<Ionicons
 								name="checkbox-outline"
 								size={24}
 								color={theme.colors.success}
 							/>
-						</TouchableOpacity>
-					) : (
-						<TouchableOpacity
-							onPress={() => {
-								setItems(
-									items.map(i => {
-										if (i.id === item.id) i.done = true;
-										return i;
-									}),
-								);
-							}}>
+						) : (
 							<Ionicons
 								name="square-outline"
 								size={24}
 								color={theme.colors.grey3}
 							/>
-						</TouchableOpacity>
-					)}
+						)}
+					</TouchableOpacity>
 
 					<ListItem.Content>
 						<Text

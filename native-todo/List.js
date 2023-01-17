@@ -7,7 +7,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 import Items from "./Items";
 
-export default function List({ items, setItems }) {
+export default function List({ items, setItems, toggleDone }) {
 	const [input, setInput] = useState("");
 	const { theme } = useTheme();
 
@@ -45,12 +45,14 @@ export default function List({ items, setItems }) {
 			<Items
 				items={items.filter(item => !item.done)}
 				setItems={setItems}
+				toggleDone={toggleDone}
 			/>
 
 			<View style={{ marginTop: 20 }}>
 				<Items
 					items={items.filter(item => item.done)}
 					setItems={setItems}
+					toggleDone={toggleDone}
 				/>
 			</View>
 		</View>

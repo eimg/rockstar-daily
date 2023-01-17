@@ -52,6 +52,15 @@ function App({ setNavMode }) {
 		{ id: 3, subject: "Bread", done: false },
 	]);
 
+	const toggleDone = id => {
+		setItems(
+			items.map(item => {
+				if (item.id === id) item.done = !item.done;
+				return item;
+			}),
+		);
+	};
+
 	const update = (id, subject) => {
 		setItems(
 			items.map(item => {
@@ -108,7 +117,67 @@ function App({ setNavMode }) {
 						</View>
 					),
 				}}>
-				{() => <List items={items} setItems={setItems} />}
+				{() => (
+					<View>
+						<List
+							items={items}
+							setItems={setItems}
+							toggleDone={toggleDone}
+						/>
+						<View
+							style={{
+								margin: 30,
+								flexDirection: "row",
+								justifyContent: "flex-end",
+							}}>
+							{items.filter(item => !item.done).length && (
+								<Button
+									color="secondary"
+									type="clear"
+									style={{ marginRight: 20 }}
+									titleStyle={{ color: theme.colors.success }}
+									onPress={() => {
+										setItems(
+											items.map(item => {
+												item.done = true;
+												return item;
+											}),
+										);
+									}}>
+									<Ionicons
+										name="checkmark-done"
+										color={theme.colors.success}
+										size={24}
+										style={{ marginRight: 10 }}
+									/>
+									Mark all done
+								</Button>
+							)}
+
+							{items.filter(item => item.done).length && (
+								<Button
+									type="outline"
+									buttonStyle={{
+										borderColor: theme.colors.error,
+									}}
+									titleStyle={{ color: theme.colors.error }}
+									onPress={() => {
+										setItems(
+											items.filter(item => !item.done),
+										);
+									}}>
+									<Ionicons
+										name="trash-bin"
+										color={theme.colors.error}
+										size={24}
+										style={{ marginRight: 10 }}
+									/>
+									Clear
+								</Button>
+							)}
+						</View>
+					</View>
+				)}
 			</Stack.Screen>
 			<Stack.Screen name="Edit">
 				{() => <Edit update={update} />}
