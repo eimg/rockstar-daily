@@ -1,4 +1,4 @@
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 
 import {
 	Box,
@@ -29,18 +29,37 @@ export const CountContext = createContext(0);
 export default function App() {
 	const theme = useTheme();
 
-	const [items, setItems] = useState([
-		{ id: 1, subject: "Egg", done: false },
-		{ id: 2, subject: "Apple", done: true },
-		{ id: 3, subject: "Bread", done: false },
-	]);
+	const [items, setItems] = useState([]);
+
+	useEffect(() => {
+		(async () => {
+			const res = await fetch("http://localhost:8000/tasks");
+			const tasks = await res.json();
+
+			setItems(tasks);
+		})();
+	}, []);
 
 	const add = subject => {
-		setItems([{ id: items.length + 1, subject, done: false }, ...items]);
+		(async () => {
+			const res = await fetch("http://localhost:8000/tasks", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({ subject })
+			});
+			const task = await res.json();
+
+			setItems([ task, ...items ])
+		})();
 	};
 
 	const remove = id => {
-		setItems(items.filter(item => item.id !== id));
+		setItems(items.filter(item => item._id !== id));
+		fetch(`http://localhost:8000/tasks/${id}`, {
+			method: "DELETE"
+		});
 	};
 
 	const get = id => {

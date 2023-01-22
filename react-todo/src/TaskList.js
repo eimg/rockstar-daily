@@ -15,9 +15,9 @@ export default function TaskList({ items, remove, toggle }) {
         <Box>
             {items.map((item) => {
                 return (
-                    <List key={item.id}>
+                    <List key={item._id}>
                         <ListItem>
-                            <IconButton onClick={() => toggle(item.id)}>
+                            <IconButton onClick={() => toggle(item._id)}>
                                 {item.done ? (
                                     <CheckIcon sx={{ color: green[500] }} />
                                 ) : (
@@ -34,11 +34,11 @@ export default function TaskList({ items, remove, toggle }) {
                                 {item.subject}
                             </ListItemText>
 
-                            <Link to={`/edit/${item.id}`}>
+                            <Link to={`/edit/${item._id}`}>
                                 <EditIcon sx={{ color: "grey", mr: 2 }} />
                             </Link>
 
-                            <IconButton onClick={() => remove(item.id)}>
+                            <IconButton onClick={() => remove(item._id)}>
                                 <DeleteIcon sx={{ color: pink[500] }} />
                             </IconButton>
                         </ListItem>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Api Client</title>
+</head>
+<body>
+	<script>
+		async function get() {
+			const res = await fetch("http://localhost:8000/tasks");
+			const data = await res.json();
+
+			console.log(data);
+		}
+
+		get();
+		console.log("done...");
+	</script>
+</body>
+</html>
