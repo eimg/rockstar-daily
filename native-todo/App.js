@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import {
 	ThemeProvider,
@@ -29,6 +29,8 @@ const rneTheme = createTheme({
 	mode: "dark",
 });
 
+const api = "http://localhost:8000";
+
 export default function NavigatedApp() {
 	const [navMode, setNavMode] = useState("dark");
 
@@ -46,11 +48,19 @@ function App({ setNavMode }) {
 	const { theme } = useTheme();
 	const { mode, setMode } = useThemeMode();
 
-	const [items, setItems] = useState([
-		{ id: 1, subject: "Egg", done: false },
-		{ id: 2, subject: "Apple", done: true },
-		{ id: 3, subject: "Bread", done: false },
-	]);
+	const [items, setItems] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
+
+	useEffect(() => {
+		setIsLoading(true);
+		(async () => {
+			const res = await fetch(`${api}/tasks`);
+			const tasks = await res.json();
+
+			setItems(tasks);
+			setIsLoading(false);
+		})();
+	}, []);
 
 	const toggleDone = id => {
 		setItems(
@@ -117,67 +127,79 @@ function App({ setNavMode }) {
 						</View>
 					),
 				}}>
-				{() => (
-					<View>
-						<List
-							items={items}
-							setItems={setItems}
-							toggleDone={toggleDone}
-						/>
-						<View
-							style={{
-								margin: 30,
-								flexDirection: "row",
-								justifyContent: "flex-end",
-							}}>
-							{items.filter(item => !item.done).length && (
-								<Button
-									color="secondary"
-									type="clear"
-									style={{ marginRight: 20 }}
-									titleStyle={{ color: theme.colors.success }}
-									onPress={() => {
-										setItems(
-											items.map(item => {
-												item.done = true;
-												return item;
-											}),
-										);
-									}}>
-									<Ionicons
-										name="checkmark-done"
-										color={theme.colors.success}
-										size={24}
-										style={{ marginRight: 10 }}
-									/>
-									Mark all done
-								</Button>
-							)}
-
-							{items.filter(item => item.done).length && (
-								<Button
-									type="outline"
-									buttonStyle={{
-										borderColor: theme.colors.error,
-									}}
-									titleStyle={{ color: theme.colors.error }}
-									onPress={() => {
-										setItems(
-											items.filter(item => !item.done),
-										);
-									}}>
-									<Ionicons
-										name="trash-bin"
-										color={theme.colors.error}
-										size={24}
-										style={{ marginRight: 10 }}
-									/>
-									Clear
-								</Button>
-							)}
+				{() => {
+					return isLoading ? (
+						<View>
+							<Text>Loading...</Text>
 						</View>
-					</View>
-				)}
+					) : (
+						<View>
+							<List
+								items={items}
+								setItems={setItems}
+								toggleDone={toggleDone}
+							/>
+							<View
+								style={{
+									margin: 30,
+									flexDirection: "row",
+									justifyContent: "flex-end",
+								}}>
+								{items.filter(item => !item.done).length && (
+									<Button
+										color="secondary"
+										type="clear"
+										style={{ marginRight: 20 }}
+										titleStyle={{
+											color: theme.colors.success,
+										}}
+										onPress={() => {
+											setItems(
+												items.map(item => {
+													item.done = true;
+													return item;
+												}),
+											);
+										}}>
+										<Ionicons
+											name="checkmark-done"
+											color={theme.colors.success}
+											size={24}
+											style={{ marginRight: 10 }}
+										/>
+										Mark all done
+									</Button>
+								)}
+
+								{items.filter(item => item.done).length && (
+									<Button
+										type="outline"
+										buttonStyle={{
+											borderColor: theme.colors.error,
+										}}
+										titleStyle={{
+											color: theme.colors.error,
+										}}
+										onPress={() => {
+											setItems(
+												items.filter(
+													item => !item.done,
+												),
+											);
+										}}>
+										<Ionicons
+											name="trash-bin"
+											color={theme.colors.error}
+											size={24}
+											style={{ marginRight: 10 }}
+										/>
+										Clear
+									</Button>
+								)}
+							</View>
+						</View>
+					);
+				}}
 			</Stack.Screen>
 			<Stack.Screen name="Edit">
 				{() => <Edit update={update} />}

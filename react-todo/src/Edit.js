@@ -17,15 +17,22 @@ import { green } from "@mui/material/colors";
 
 import { useEffect, useState } from "react";
 
-export default function Edit({ get, update }) {
+const api = "http://localhost:8000";
+
+export default function Edit({ update }) {
     const { id } = useParams();
     const navigate = useNavigate();
 
     const [subject, setSubject] = useState("");
 
     useEffect(() => {
-        setSubject(get(id).subject);
-    }, [id, get]);
+		(async () => {
+			const res = await fetch(`${api}/tasks/${id}`);
+			const task = await res.json();
+
+			setSubject(task.subject);
+		})();
+    }, [id]);
 
     return (
         <Container maxWidth="sm" sx={{ mt: 4 }}>

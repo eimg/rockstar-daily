@@ -26,6 +26,8 @@ import Title from "./Title";
 
 export const CountContext = createContext(0);
 
+const api = "http://localhost:8000";
+
 export default function App() {
 	const theme = useTheme();
 
@@ -33,7 +35,7 @@ export default function App() {
 
 	useEffect(() => {
 		(async () => {
-			const res = await fetch("http://localhost:8000/tasks");
+			const res = await fetch(`${api}/tasks`);
 			const tasks = await res.json();
 
 			setItems(tasks);
@@ -42,7 +44,7 @@ export default function App() {
 
 	const add = subject => {
 		(async () => {
-			const res = await fetch("http://localhost:8000/tasks", {
+			const res = await fetch(`${api}/tasks`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json"
@@ -57,35 +59,44 @@ export default function App() {
 
 	const remove = id => {
 		setItems(items.filter(item => item._id !== id));
-		fetch(`http://localhost:8000/tasks/${id}`, {
+		fetch(`${api}/tasks/${id}`, {
 			method: "DELETE"
 		});
-	};
-
-	const get = id => {
-		return items.filter(item => item.id === parseInt(id))[0];
 	};
 
 	const update = (id, subject) => {
 		setItems(
 			items.map(item => {
-				if (item.id === parseInt(id)) item.subject = subject;
+				if (item._id === id) item.subject = subject;
 				return item;
 			}),
 		);
+
+		fetch(`${api}/tasks/${id}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({ subject })
+		});
 	};
 
 	const toggle = id => {
 		const result = items.map(item => {
-			if (item.id === id) item.done = !item.done;
+			if (item._id === id) item.done = !item.done;
 			return item;
 		});
 
 		setItems(result);
+
+		fetch(`${api}/tasks/${id}/toggle`, {
+			method: "PUT",
+		});
 	};
 
 	const clear = () => {
 		setItems(items.filter(item => !item.done));
+		fetch(`${api}/tasks`, { method: "DELETE" });
 	};
 
 	const changeMode = useContext(ModeContext);
@@ -146,7 +157,7 @@ export default function App() {
 					/>
 					<Route
 						path="/edit/:id"
-						element={<Edit get={get} update={update} />}
+						element={<Edit update={update} />}
 					/>
 				</Routes>
 			</Box>
