@@ -1,4 +1,3 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -6,12 +5,17 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+
 import {
 	Login as LoginIcon,
 	PersonAdd as PersonAddIcon
 } from "@mui/icons-material";
 
+import { useNavigate } from "react-router-dom";
+
 export default function MainDrawer({drawerState, toggleDrawer}) {
+	const navigate = useNavigate();
+
 	const list = () => (
 		<Box
 			sx={{ width: 250 }}
@@ -19,7 +23,10 @@ export default function MainDrawer({drawerState, toggleDrawer}) {
 			onKeyDown={toggleDrawer(false)}>
 			<List>
 				<ListItem disablePadding>
-					<ListItemButton>
+					<ListItemButton
+						onClick={() => {
+							navigate("/login");
+						}}>
 						<ListItemIcon>
 							<LoginIcon />
 						</ListItemIcon>
@@ -27,7 +34,10 @@ export default function MainDrawer({drawerState, toggleDrawer}) {
 					</ListItemButton>
 				</ListItem>
 				<ListItem disablePadding>
-					<ListItemButton>
+					<ListItemButton
+						onClick={() => {
+							navigate("/register");
+						}}>
 						<ListItemIcon>
 							<PersonAddIcon />
 						</ListItemIcon>
@@ -39,15 +49,8 @@ export default function MainDrawer({drawerState, toggleDrawer}) {
 	);
 
 	return (
-		<div>
-			<React.Fragment>
-				<Drawer
-					anchor="left"
-					open={drawerState}
-					onClose={toggleDrawer(false)}>
-					{list()}
-				</Drawer>
-			</React.Fragment>
-		</div>
+		<Drawer anchor="left" open={drawerState} onClose={toggleDrawer(false)}>
+			{list()}
+		</Drawer>
 	);
 }

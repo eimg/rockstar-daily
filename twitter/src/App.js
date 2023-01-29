@@ -1,6 +1,12 @@
 import { useState } from "react";
 import MainDrawer from "./MainDrawer";
 import Header from "./Header";
+import Register from "./Register";
+import Login from "./Login";
+
+import { Routes, Route } from "react-router-dom";
+
+const Home = <div>Home</div>;
 
 export default function App() {
 	const [drawerState, setDrawerState] = useState(false);
@@ -20,6 +26,11 @@ export default function App() {
 		<div>
 			<Header toggleDrawer={toggleDrawer} />
 			<MainDrawer drawerState={drawerState} toggleDrawer={toggleDrawer} />
+			<Routes>
+				<Route path="/" element={Home} />
+				<Route path="/login" element={<Login />} />
+				<Route path="/register" element={<Register />} />
+			</Routes>
 		</div>
 	);
 }
