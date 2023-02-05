@@ -76,11 +76,37 @@ app.post('/users/register', async (req, res) => {
 	res.status(500).json({msg: "something wrong, please try again"});
 });
 
+app.put('/users/:id', auth, async(req, res) => {
+	const { id } = req.params;
+	const { name, profile, password } = req.body;
+
+	if (!name) {
+		return res.status(400).json({ msg: "name required" });
+	}
+
+	const data = { name, profile };
+	if(password) {
+		data.password = await bcrypt.hash(password, 10);
+	}
+
+	const result = await db.collection("users").updateOne(
+		{ _id: ObjectId(id) },
+		{ $set: data }
+	);
+
+	if(result.acknowledged) {
+		const user = await db.collection("users").findOne({ _id: ObjectId(id) });
+		return res.json(user);
+	}
+
+	res.sendStatus(500);
+});
+
 app.get('/users', auth, async (req, res) => {
 	const users = await db.collection("users").find().toArray();
 	res.json(users);
 });
 
 app.listen(8000, () => {
-	console.log("API server running at 80000");
+	console.log("API server running at 8000");
 });

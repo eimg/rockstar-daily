@@ -8,43 +8,92 @@ import ListItemText from "@mui/material/ListItemText";
 
 import {
 	Login as LoginIcon,
-	PersonAdd as PersonAddIcon
+	PersonAdd as PersonAddIcon,
+	Logout as LogoutIcon,
+	Person as PersonIcon,
 } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
 
-export default function MainDrawer({drawerState, toggleDrawer}) {
+import { useAuth } from "./AuthProvider";
+import { Typography } from "@mui/material";
+
+export default function MainDrawer({ drawerState, toggleDrawer }) {
 	const navigate = useNavigate();
+
+	const { auth, setAuth, authUser, setAuthUser } = useAuth();
 
 	const list = () => (
 		<Box
 			sx={{ width: 250 }}
 			onClick={toggleDrawer(false)}
 			onKeyDown={toggleDrawer(false)}>
-			<List>
-				<ListItem disablePadding>
-					<ListItemButton
-						onClick={() => {
-							navigate("/login");
-						}}>
-						<ListItemIcon>
-							<LoginIcon />
-						</ListItemIcon>
-						<ListItemText primary="Login" />
-					</ListItemButton>
-				</ListItem>
-				<ListItem disablePadding>
-					<ListItemButton
-						onClick={() => {
-							navigate("/register");
-						}}>
-						<ListItemIcon>
-							<PersonAddIcon />
-						</ListItemIcon>
-						<ListItemText primary="Register" />
-					</ListItemButton>
-				</ListItem>
-			</List>
+			<Box
+				sx={{
+					height: 150,
+					bgcolor: "grey",
+					p: 3,
+					display: "flex",
+					alignItems: "flex-end",
+				}}>
+				<Typography sx={{ color: "white" }}>
+					{authUser.name}@{authUser.handle}
+				</Typography>
+			</Box>
+
+			{auth ? (
+				<List>
+					<ListItem disablePadding>
+						<ListItemButton
+							onClick={() => {
+								navigate("/profile");
+							}}>
+							<ListItemIcon>
+								<PersonIcon />
+							</ListItemIcon>
+							<ListItemText primary="Profile" />
+						</ListItemButton>
+					</ListItem>
+					<ListItem disablePadding>
+						<ListItemButton
+							onClick={() => {
+								setAuth(false);
+								setAuthUser({});
+								localStorage.removeItem("token");
+							}}>
+							<ListItemIcon>
+								<LogoutIcon />
+							</ListItemIcon>
+							<ListItemText primary="Logout" />
+						</ListItemButton>
+					</ListItem>
+				</List>
+			) : (
+				<List>
+					<ListItem disablePadding>
+						<ListItemButton
+							onClick={() => {
+								navigate("/login");
+							}}>
+							<ListItemIcon>
+								<LoginIcon />
+							</ListItemIcon>
+							<ListItemText primary="Login" />
+						</ListItemButton>
+					</ListItem>
+					<ListItem disablePadding>
+						<ListItemButton
+							onClick={() => {
+								navigate("/register");
+							}}>
+							<ListItemIcon>
+								<PersonAddIcon />
+							</ListItemIcon>
+							<ListItemText primary="Register" />
+						</ListItemButton>
+					</ListItem>
+				</List>
+			)}
 		</Box>
 	);
 
