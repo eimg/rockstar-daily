@@ -6,6 +6,7 @@ import Login from "./Login";
 import Profile from "./Profile";
 import Edit from "./Edit";
 import Home from "./Home";
+import Tweet from "./Tweet";
 
 import { Routes, Route } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
@@ -56,6 +57,7 @@ export default function App() {
 				<Route path="/register" element={<Register />} />
 				<Route path="/profile" element={<Profile />} />
 				<Route path="/edit" element={<Edit />} />
+				<Route path="/tweet/:id" element={<Tweet tweets={tweets} />} />
 			</Routes>
 		</div>
 	);

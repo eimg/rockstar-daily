@@ -7,6 +7,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 
 import {
+	Home as HomeIcon,
 	Login as LoginIcon,
 	PersonAdd as PersonAddIcon,
 	Logout as LogoutIcon,
@@ -40,6 +41,20 @@ export default function MainDrawer({ drawerState, toggleDrawer }) {
 					{authUser.name}@{authUser.handle}
 				</Typography>
 			</Box>
+
+			<List>
+				<ListItem disablePadding>
+					<ListItemButton
+						onClick={() => {
+							navigate("/");
+						}}>
+						<ListItemIcon>
+							<HomeIcon />
+						</ListItemIcon>
+						<ListItemText primary="Home" />
+					</ListItemButton>
+				</ListItem>
+			</List>
 
 			{auth ? (
 				<List>

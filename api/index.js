@@ -120,7 +120,7 @@ app.get("/tweets", async (req, res) => {
 			.aggregate([
 				{
 					$sort: {
-						created: -1,
+						created: 1,
 					},
 				},
 				{ $limit: 20 },
@@ -130,6 +130,32 @@ app.get("/tweets", async (req, res) => {
 						localField: "owner",
 						foreignField: "_id",
 						as: "owner_user",
+					},
+				},
+				{
+					$lookup: {
+						from: "tweets",
+						localField: "_id",
+						foreignField: "origin",
+						as: "comments",
+						pipeline: [
+							{
+								$lookup: {
+									from: "users",
+									localField: "owner",
+									foreignField: "_id",
+									as: "owner_user",
+								},
+							},
+							{
+								$lookup: {
+									from: "tweets",
+									localField: "_id",
+									foreignField: "origin",
+									as: "comments",
+								},
+							},
+						],
 					},
 				},
 			])
