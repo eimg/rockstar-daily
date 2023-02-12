@@ -9,12 +9,21 @@ import Home from "./Home";
 
 import { Routes, Route } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
-import { verify } from "./apiCalls";
+import { getTweets, verify } from "./apiCalls";
 
 export default function App() {
 	const [drawerState, setDrawerState] = useState(false);
 
 	const { setAuth, setAuthUser } = useAuth();
+
+	const [tweets, setTweets] = useState([]);
+
+	useEffect(() => {
+		(async () => {
+			const tweets = await getTweets();
+			setTweets(tweets);
+		})();
+	}, []);
 
 	useEffect(() => {
 		(async () => {
@@ -36,12 +45,6 @@ export default function App() {
 
 		setDrawerState(open);
 	};
-
-	const tweets = [
-		{ user: "Alice", body: "Some tweet body conent" },
-		{ user: "Bob", body: "Some other tweet post body" },
-		{ user: "Tom", body: "More tweet body content"},
-	];
 
 	return (
 		<div>

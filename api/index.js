@@ -33,38 +33,43 @@ function auth(req, res, next) {
 	});
 }
 
-app.post('/users/login', async (req, res) => {
+app.post("/users/login", async (req, res) => {
 	const { handle, password } = req.body;
 
-	if(!handle || !password) {
-		return res.status(400).json({msg: "handle or password missing"});
+	if (!handle || !password) {
+		return res.status(400).json({ msg: "handle or password missing" });
 	}
 
 	const user = await db.collection("users").findOne({ handle });
-	if(user) {
+	if (user) {
 		const valid = await bcrypt.compare(password, user.password);
-		if(valid) {
+		if (valid) {
 			const token = jwt.sign(user, secret);
 			return res.send(token);
 		}
 	}
 
-	res.status(401).json({msg: "handle or password incorrect"});
+	res.status(401).json({ msg: "handle or password incorrect" });
 });
 
-app.get('/users/verify', auth, (req, res) => {
+app.get("/users/verify", auth, (req, res) => {
 	res.json(res.locals.user);
 });
 
-app.post('/users/register', async (req, res) => {
+app.post("/users/register", async (req, res) => {
 	const { name, handle, password, profile } = req.body;
-	if(!name || !handle || !password) {
-		return res.status(400).json({ msg: "name, handle, password: all required" });
+	if (!name || !handle || !password) {
+		return res
+			.status(400)
+			.json({ msg: "name, handle, password: all required" });
 	}
 
 	const hash = await bcrypt.hash(password, 10);
 	const result = await db.collection("users").insertOne({
-		name, handle, password: hash, profile
+		name,
+		handle,
+		password: hash,
+		profile,
 	});
 
 	if (result.insertedId) {
@@ -73,10 +78,10 @@ app.post('/users/register', async (req, res) => {
 		});
 		return res.json(user);
 	}
-	res.status(500).json({msg: "something wrong, please try again"});
+	res.status(500).json({ msg: "something wrong, please try again" });
 });
 
-app.put('/users/:id', auth, async(req, res) => {
+app.put("/users/:id", auth, async (req, res) => {
 	const { id } = req.params;
 	const { name, profile, password } = req.body;
 
@@ -85,26 +90,55 @@ app.put('/users/:id', auth, async(req, res) => {
 	}
 
 	const data = { name, profile };
-	if(password) {
+	if (password) {
 		data.password = await bcrypt.hash(password, 10);
 	}
 
-	const result = await db.collection("users").updateOne(
-		{ _id: ObjectId(id) },
-		{ $set: data }
-	);
+	const result = await db
+		.collection("users")
+		.updateOne({ _id: ObjectId(id) }, { $set: data });
 
-	if(result.acknowledged) {
-		const user = await db.collection("users").findOne({ _id: ObjectId(id) });
+	if (result.acknowledged) {
+		const user = await db
+			.collection("users")
+			.findOne({ _id: ObjectId(id) });
 		return res.json(user);
 	}
 
 	res.sendStatus(500);
 });
 
-app.get('/users', auth, async (req, res) => {
+app.get("/users", auth, async (req, res) => {
 	const users = await db.collection("users").find().toArray();
 	res.json(users);
+});
+
+app.get("/tweets", async (req, res) => {
+	try {
+		const tweets = await db
+			.collection("tweets")
+			.aggregate([
+				{
+					$sort: {
+						created: -1,
+					},
+				},
+				{ $limit: 20 },
+				{
+					$lookup: {
+						from: "users",
+						localField: "owner",
+						foreignField: "_id",
+						as: "owner_user",
+					},
+				},
+			])
+			.toArray();
+
+		res.json(tweets);
+	} catch (e) {
+		res.sendStatus(500);
+	}
 });
 
 app.listen(8000, () => {

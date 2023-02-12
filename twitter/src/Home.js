@@ -5,7 +5,17 @@ import {
 	CardActionArea,
 	CardContent,
 	Typography,
+	ButtonGroup,
+	Button,
+	IconButton,
 } from "@mui/material";
+
+import { blue, pink, green } from "@mui/material/colors";
+
+import {
+	FavoriteBorder as FavoriteBorderIcon,
+	ChatBubbleOutline as ChatBubbleOutlineIcon,
+} from "@mui/icons-material";
 
 export default function Home({ tweets }) {
 	return (
@@ -14,13 +24,38 @@ export default function Home({ tweets }) {
 				return (
 					<Card sx={{ mb: 2 }}>
 						<CardContent sx={{ display: "flex" }}>
-							<Avatar
-								alt="Profile"
-								sx={{ width: 64, height: 64 }}
-							/>
-							<Box sx={{ ml: 2, mt: 1 }}>
-								<Typography>{tweet.user}</Typography>
+							<Avatar alt="Profile" sx={{ width: 64, height: 64, background: blue[600], }} />
+							<Box sx={{ ml: 2, flexGrow: 1 }}>
+								<Box sx={{ display: "flex", mb: 1 }}>
+									<Typography
+										sx={{ fontWeight: "bold", fontSize: "0.9em", }}>
+										{tweet.owner_user[0].name}
+									</Typography>
+									<Typography
+										sx={{ fontSize: "0.8em", ml: 1, color: "grey", }}>
+										@{tweet.owner_user[0].handle}
+									</Typography>
+									<Typography
+										sx={{ fontSize: "0.8em", ml: 1, color: blue[500], }}>
+										{tweet.created}
+									</Typography>
+								</Box>
 								<CardActionArea>{tweet.body}</CardActionArea>
+								<Box
+									sx={{ display: "flex", justifyContent: "space-around", mt: 2 }}>
+									<ButtonGroup>
+										<IconButton>
+											<FavoriteBorderIcon sx={{ color: pink[500] }} />
+										</IconButton>
+										<Button variant="clear"> {tweet.likes.length} </Button>
+									</ButtonGroup>
+									<ButtonGroup>
+										<IconButton>
+											<ChatBubbleOutlineIcon sx={{ color: green[500] }} />
+										</IconButton>
+										<Button variant="clear">0</Button>
+									</ButtonGroup>
+								</Box>
 							</Box>
 						</CardContent>
 					</Card>
