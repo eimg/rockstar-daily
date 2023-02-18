@@ -120,7 +120,7 @@ app.get("/tweets", async (req, res) => {
 			.aggregate([
 				{
 					$sort: {
-						created: 1,
+						created: -1,
 					},
 				},
 				{ $limit: 20 },
@@ -164,6 +164,101 @@ app.get("/tweets", async (req, res) => {
 		res.json(tweets);
 	} catch (e) {
 		res.sendStatus(500);
+	}
+});
+
+app.get("/tweets/:id", async (req, res) => {
+	const { id } = req.params;
+
+	try {
+		const tweet = await db
+			.collection("tweets")
+			.aggregate([
+				{
+					$match: { _id: ObjectId(id) },
+				},
+				{
+					$lookup: {
+						from: "users",
+						localField: "owner",
+						foreignField: "_id",
+						as: "owner_user",
+					},
+				},
+				{
+					$lookup: {
+						from: "tweets",
+						localField: "_id",
+						foreignField: "origin",
+						as: "comments",
+						pipeline: [
+							{
+								$lookup: {
+									from: "users",
+									localField: "owner",
+									foreignField: "_id",
+									as: "owner_user",
+								},
+							},
+							{
+								$lookup: {
+									from: "tweets",
+									localField: "_id",
+									foreignField: "origin",
+									as: "comments",
+								},
+							},
+						],
+					},
+				},
+			])
+			.toArray();
+
+		res.json(tweet[0]);
+	} catch (e) {
+		res.sendStatus(500);
+	}
+});
+
+app.post("/tweet", auth, async (req, res) => {
+	const user = res.locals.user;
+	const { body } = req.body;
+
+	if (!body)
+		return res.status(400).json({ msg: "body required" });
+
+	const result = await db.collection("tweets").insertOne({
+		type: "post",
+		body,
+		owner: ObjectId(user._id),
+		created: new Date(),
+		likes: [],
+	});
+
+	if (result.insertedId) {
+		const tweet = await db
+			.collection("tweets")
+			.aggregate([
+				{
+					$match: { _id: ObjectId(result.insertedId) },
+				},
+				{
+					$lookup: {
+						from: "users",
+						localField: "owner",
+						foreignField: "_id",
+						as: "owner_user",
+					},
+				},
+			])
+			.toArray();
+
+		let data = tweet[0];
+		data.comments = [];
+
+		return res.json(data);
+	} else {
+		return res.status(500).json(result);
 	}
 });
 

@@ -42,22 +42,19 @@ export default function MainDrawer({ drawerState, toggleDrawer }) {
 				</Typography>
 			</Box>
 
-			<List>
-				<ListItem disablePadding>
-					<ListItemButton
-						onClick={() => {
-							navigate("/");
-						}}>
-						<ListItemIcon>
-							<HomeIcon />
-						</ListItemIcon>
-						<ListItemText primary="Home" />
-					</ListItemButton>
-				</ListItem>
-			</List>
-
 			{auth ? (
 				<List>
+					<ListItem disablePadding>
+						<ListItemButton
+							onClick={() => {
+								navigate("/");
+							}}>
+							<ListItemIcon>
+								<HomeIcon />
+							</ListItemIcon>
+							<ListItemText primary="Home" />
+						</ListItemButton>
+					</ListItem>
 					<ListItem disablePadding>
 						<ListItemButton
 							onClick={() => {
@@ -85,6 +82,17 @@ export default function MainDrawer({ drawerState, toggleDrawer }) {
 				</List>
 			) : (
 				<List>
+					<ListItem disablePadding>
+						<ListItemButton
+							onClick={() => {
+								navigate("/");
+							}}>
+							<ListItemIcon>
+								<HomeIcon />
+							</ListItemIcon>
+							<ListItemText primary="Home" />
+						</ListItemButton>
+					</ListItem>
 					<ListItem disablePadding>
 						<ListItemButton
 							onClick={() => {

@@ -73,3 +73,29 @@ export async function getTweets() {
 	const tweets = await res.json();
 	return tweets;
 }
+
+export async function getTweet(id) {
+	const res = await fetch(`${api}/tweets/${id}`);
+	if (!res.ok) return false;
+
+	const tweet = await res.json();
+	return tweet;
+}
+
+export async function postTweet(body) {
+	const token = getToken();
+
+	const res = await fetch(`${api}/tweet`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"Authorization": `Bearer ${token}`
+		},
+		body: JSON.stringify({ body })
+	});
+
+	if (!res.ok) return false;
+
+	const tweet = await res.json();
+	return tweet;
+}
