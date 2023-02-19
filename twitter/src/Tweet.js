@@ -8,6 +8,7 @@ import {
 	ButtonGroup,
 	Button,
 	IconButton,
+	OutlinedInput,
 } from "@mui/material";
 
 import { blue, pink, green } from "@mui/material/colors";
@@ -19,15 +20,17 @@ import {
 } from "@mui/icons-material";
 
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
-import { getTweet } from "./apiCalls";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { getTweet, postComment } from "./apiCalls";
 
-export default function Tweet({ tweets }) {
+export default function Tweet({ tweets, updateTweets }) {
 	const { id } = useParams();
 
 	const navigate = useNavigate();
 	const [tweet, setTweet] = useState({});
 	const [loading, setLoading] = useState(true);
+
+	const body = useRef();
 
 	// const cache = useMemo(() => {
 	// 	const result = tweets.filter(t => t._id == id);
@@ -196,6 +199,45 @@ export default function Tweet({ tweets }) {
 						</Card>
 					);
 				})}
+
+				<Box>
+					<form
+						onSubmit={e => {
+							e.preventDefault();
+
+							(async () => {
+								if (!body.current.value) return false;
+
+								const comment = await postComment(
+									body.current.value,
+									tweet._id,
+								);
+
+								if (!comment) return false;
+
+								const result = await getTweet(id);
+								setTweet(result);
+								updateTweets(result);
+							})();
+						}}>
+						<OutlinedInput
+							placeholder="Your reply"
+							fullWidth
+							inputRef={body}
+							multiline
+							sx={{ mb: 2 }}
+						/>
+						<Box
+							sx={{
+								display: "flex",
+								justifyContent: "flex-end",
+							}}>
+							<Button type="submit" variant="contained">
+								Reply
+							</Button>
+						</Box>
+					</form>
+				</Box>
 			</Box>
 		)
 	);

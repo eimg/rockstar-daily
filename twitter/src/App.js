@@ -9,6 +9,7 @@ import Edit from "./Edit";
 import Home from "./Home";
 import Tweet from "./Tweet";
 import Add from "./Add";
+import Likes from "./Likes";
 
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
@@ -23,7 +24,7 @@ export default function App() {
 
 	const [drawerState, setDrawerState] = useState(false);
 
-	const { setAuth, setAuthUser } = useAuth();
+	const { setAuth, setAuthUser, authUser } = useAuth();
 
 	const [tweets, setTweets] = useState([]);
 
@@ -60,20 +61,54 @@ export default function App() {
 	const addTweet = tweet => {
 		setFeedback(true);
 		setTweets([tweet, ...tweets]);
-	}
+	};
+
+	const updateTweets = update => {
+		setTweets(
+			tweets.map(tweet => {
+				if (tweet._id === update._id) return update;
+				else return tweet;
+			}),
+		);
+	};
+
+	const toggleLike = id => {
+		setTweets(
+			tweets.map(tweet => {
+				if (tweet._id === id) {
+					if (tweet.likes.find(n => n === authUser._id)) {
+						tweet.likes = tweet.likes.filter(n => n !== authUser._id);
+					} else {
+						tweet.likes = [authUser._id, ...tweet.likes];
+					}
+				}
+
+				return tweet;
+			}),
+		);
+	};
 
 	return (
 		<div>
 			<Header toggleDrawer={toggleDrawer} />
 			<MainDrawer drawerState={drawerState} toggleDrawer={toggleDrawer} />
 			<Routes>
-				<Route path="/" element={<Home tweets={tweets} />} />
+				<Route
+					path="/"
+					element={<Home tweets={tweets} toggleLike={toggleLike} />}
+				/>
 				<Route path="/add" element={<Add addTweet={addTweet} />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/register" element={<Register />} />
 				<Route path="/profile" element={<Profile />} />
 				<Route path="/edit" element={<Edit />} />
-				<Route path="/tweet/:id" element={<Tweet tweets={tweets} />} />
+				<Route path="/likes" element={<Likes />} />
+				<Route
+					path="/tweet/:id"
+					element={
+						<Tweet tweets={tweets} updateTweets={updateTweets} />
+					}
+				/>
 			</Routes>
 
 			<Snackbar

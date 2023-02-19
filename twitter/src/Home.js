@@ -20,8 +20,12 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-export default function Home({ tweets }) {
+import { useAuth } from "./AuthProvider";
+
+export default function Home({ tweets, toggleLike }) {
 	const navigate = useNavigate();
+
+	const { authUser } = useAuth();
 
 	return (
 		<Box sx={{ my: 3, mx: { lg: 20, md: 5, sm: 5, xs: 3 } }}>
@@ -63,9 +67,12 @@ export default function Home({ tweets }) {
 										{tweet.created}
 									</Typography>
 								</Box>
-								<CardActionArea onClick={() => {
-									navigate(`/tweet/${tweet._id}`);
-								}}>{tweet.body}</CardActionArea>
+								<CardActionArea
+									onClick={() => {
+										navigate(`/tweet/${tweet._id}`);
+									}}>
+									{tweet.body}
+								</CardActionArea>
 								<Box
 									sx={{
 										display: "flex",
@@ -73,12 +80,29 @@ export default function Home({ tweets }) {
 										mt: 2,
 									}}>
 									<ButtonGroup>
-										<IconButton>
-											<FavoriteBorderIcon
-												sx={{ color: pink[500] }}
-											/>
+										<IconButton onClick={() => {
+											toggleLike(tweet._id);
+										}}>
+											{tweet.likes.find(
+												n => n === authUser._id,
+											) ? (
+												<FavoriteIcon
+													sx={{ color: pink[500] }}
+												/>
+											) : (
+												<FavoriteBorderIcon
+													sx={{ color: pink[500] }}
+												/>
+											)}
 										</IconButton>
-										<Button variant="clear">
+
+										<Button variant="clear" onClick={() => {
+											navigate("/likes", {
+												state: {
+													users: tweet.likes_users,
+												},
+											});
+										}}>
 											{tweet.likes.length}
 										</Button>
 									</ButtonGroup>
