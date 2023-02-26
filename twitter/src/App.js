@@ -10,6 +10,8 @@ import Home from "./Home";
 import Tweet from "./Tweet";
 import Add from "./Add";
 import Likes from "./Likes";
+import Followers from "./Followers";
+import Following from "./Following";
 
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
@@ -100,9 +102,11 @@ export default function App() {
 				<Route path="/add" element={<Add addTweet={addTweet} />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/register" element={<Register />} />
-				<Route path="/profile" element={<Profile />} />
+				<Route path="/@/:handle" element={<Profile />} />
 				<Route path="/edit" element={<Edit />} />
 				<Route path="/likes" element={<Likes />} />
+				<Route path="/followers" element={<Followers />} />
+				<Route path="/following" element={<Following />} />
 				<Route
 					path="/tweet/:id"
 					element={

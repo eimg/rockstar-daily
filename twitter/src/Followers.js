@@ -11,7 +11,7 @@ import { useLocation, Link } from "react-router-dom";
 
 import FollowButton from "./FollowButton";
 
-export default function Likes() {
+export default function Followers() {
 	const location = useLocation();
 	const { users } = location.state;
 
@@ -22,7 +22,9 @@ export default function Likes() {
 					return (
 						<ListItem
 							key={user._id}
-							secondaryAction={<FollowButton user={user} />}>
+							secondaryAction={
+								<FollowButton user={user} />
+							}>
 							<ListItemAvatar>
 								<Link to={`/@${user.handle}`}>
 									<Avatar alt="Profile"></Avatar>

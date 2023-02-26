@@ -58,7 +58,7 @@ export default function MainDrawer({ drawerState, toggleDrawer }) {
 					<ListItem disablePadding>
 						<ListItemButton
 							onClick={() => {
-								navigate("/profile");
+								navigate(`/@/${authUser.handle}`);
 							}}>
 							<ListItemIcon>
 								<PersonIcon />

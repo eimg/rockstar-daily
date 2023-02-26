@@ -11,7 +11,7 @@ import { useLocation, Link } from "react-router-dom";
 
 import FollowButton from "./FollowButton";
 
-export default function Likes() {
+export default function Following() {
 	const location = useLocation();
 	const { users } = location.state;
 

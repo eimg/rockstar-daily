@@ -32,40 +32,56 @@ export default function Home({ tweets, toggleLike }) {
 			{tweets.map(tweet => {
 				return (
 					<Card sx={{ mb: 2 }} key={tweet._id}>
-						<CardContent sx={{ display: "flex" }}>
-							<Avatar
-								alt="Profile"
-								sx={{
-									width: 64,
-									height: 64,
-									background: blue[600],
-								}}
-							/>
+						<CardContent sx={{ display: "flex", alignItems: 'flex-start' }}>
+							<IconButton onClick={() => {
+								navigate(`/@/${tweet.owner_user[0].handle}`);
+							}}>
+								<Avatar
+									alt="Profile"
+									sx={{
+										width: 64,
+										height: 64,
+										background: blue[600],
+									}}
+								/>
+							</IconButton>
 							<Box sx={{ ml: 2, flexGrow: 1 }}>
 								<Box sx={{ display: "flex", mb: 1 }}>
-									<Typography
+									<CardActionArea
 										sx={{
-											fontWeight: "bold",
-											fontSize: "0.9em",
+											display: "flex",
+											justifyContent: "flex-start",
+											flexWrap: 'wrap'
+										}}
+										onClick={() => {
+											navigate(
+												`/@/${tweet.owner_user[0].handle}`,
+											);
 										}}>
-										{tweet.owner_user[0].name}
-									</Typography>
-									<Typography
-										sx={{
-											fontSize: "0.8em",
-											ml: 1,
-											color: "grey",
-										}}>
-										@{tweet.owner_user[0].handle}
-									</Typography>
-									<Typography
-										sx={{
-											fontSize: "0.8em",
-											ml: 1,
-											color: blue[500],
-										}}>
-										{tweet.created}
-									</Typography>
+										<Typography
+											sx={{
+												fontWeight: "bold",
+												fontSize: "0.9em",
+											}}>
+											{tweet.owner_user[0].name}
+										</Typography>
+										<Typography
+											sx={{
+												fontSize: "0.8em",
+												ml: 1,
+												color: "grey",
+											}}>
+											@{tweet.owner_user[0].handle}
+										</Typography>
+										<Typography
+											sx={{
+												fontSize: "0.8em",
+												ml: 1,
+												color: blue[500],
+											}}>
+											{tweet.created}
+										</Typography>
+									</CardActionArea>
 								</Box>
 								<CardActionArea
 									onClick={() => {
@@ -80,9 +96,10 @@ export default function Home({ tweets, toggleLike }) {
 										mt: 2,
 									}}>
 									<ButtonGroup>
-										<IconButton onClick={() => {
-											toggleLike(tweet._id);
-										}}>
+										<IconButton
+											onClick={() => {
+												toggleLike(tweet._id);
+											}}>
 											{tweet.likes.find(
 												n => n === authUser._id,
 											) ? (
@@ -96,13 +113,15 @@ export default function Home({ tweets, toggleLike }) {
 											)}
 										</IconButton>
 
-										<Button variant="clear" onClick={() => {
-											navigate("/likes", {
-												state: {
-													users: tweet.likes_users,
-												},
-											});
-										}}>
+										<Button
+											variant="clear"
+											onClick={() => {
+												navigate("/likes", {
+													state: {
+														users: tweet.likes_users,
+													},
+												});
+											}}>
 											{tweet.likes.length}
 										</Button>
 									</ButtonGroup>

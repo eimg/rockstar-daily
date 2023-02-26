@@ -117,3 +117,45 @@ export async function postComment(body, origin) {
 	const tweet = await res.json();
 	return tweet;
 }
+
+export async function getUser(handle) {
+	const res = await fetch(`${api}/users/${handle}`);
+	if (!res.ok) return false;
+
+	const user = await res.json();
+
+	return user;
+}
+
+export async function getUserTweets(id) {
+	const res = await fetch(`${api}/tweets/user/${id}`);
+	if (!res.ok) return false;
+
+	const tweets = await res.json();
+
+	return tweets;
+}
+
+export async function toggleFollow(id) {
+	const token = getToken();
+
+	const res = await fetch(`${api}/users/${id}/follow`, {
+		'method': 'PUT',
+		'headers': {
+			'Authorization': `Bearer ${token}`
+		}
+	});
+
+	if(!res.ok) return false;
+
+	const result = await res.json();
+	return result;
+}
+
+export async function searchUsers(q) {
+	const res = await fetch(`${api}/search?q=${q}`);
+	if(!res.ok) return false;
+
+	const users = await res.json();
+	return users;
+}
