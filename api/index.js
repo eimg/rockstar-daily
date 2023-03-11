@@ -414,7 +414,7 @@ app.post("/comment", auth, async (req, res) => {
 	}
 });
 
-app.put("/tweets/:id/toggle/like", auth, async (req, res) => {
+app.put("/like/:id", auth, async (req, res) => {
 	const id = req.params.id;
 	const user = res.locals.user._id;
 
@@ -537,6 +537,93 @@ app.get("/search", async (req, res) => {
 	}
 
 	return res.status(401).json({ msg: "user not found" });
+});
+
+app.get("/notis", auth, async (req, res) => {
+	const user = res.locals.user;
+
+	try {
+		let result = await db
+			.collection("notis")
+			.aggregate([
+				{ $match: { owner: ObjectId(user._id) }, },
+				{ $sort: { _id: -1 }, },
+				{ $limit: 40, },
+				{
+					$lookup: {
+						from: "users",
+						localField: "actor",
+						foreignField: "_id",
+						as: "user",
+					},
+				},
+			])
+			.toArray();
+
+		return res.status(200).json(result);
+	} catch (e) {
+		return res.status(500).json({ error: e.message });
+	}
+});
+
+app.post("/notis", auth, async (req, res) => {
+	const user = res.locals.user;
+	const { type, target } = req.body;
+
+	let tweet = await db.collection("tweets").findOne({
+		_id: ObjectId(target),
+	});
+
+	// No noti for unlike
+	if (!tweet.likes.find(item => item.toString() === user._id))
+		return res.status(304).end();
+
+	// No noti for own posts
+	if (user._id === tweet.owner.toString()) return res.status(304).end();
+
+	let result = await db.collection("notis").insertOne({
+		type,
+		actor: ObjectId(user._id),
+		msg: `${type}s your tweet.`,
+		target: ObjectId(target),
+		owner: tweet.owner,
+		read: false,
+		created: new Date(),
+	});
+
+	let noti = await db.collection("notis").findOne({
+		_id: result.insertedId,
+	});
+
+	return res.status(201).json(noti);
+});
+
+// Mark all notis read
+app.put("/notis", auth, (req, res) => {
+	const user = res.locals.user;
+
+	db.collection("notis").updateMany(
+		{ owner: ObjectId(user._id) },
+		{
+			$set: { read: true },
+		},
+	);
+
+	return res.status(200).json({ msg: "all notis marked read" });
+});
+
+// Mark one noti read
+app.put("/notis/:id", auth, async (req, res) => {
+	const id = req.params.id;
+
+	db.collection("notis").updateOne(
+		{ _id: ObjectId(id) },
+		{
+			$set: { read: true },
+		},
+	);
+
+	return res.status(200).json({ msg: "noti marked read" });
 });
 
 app.listen(8000, () => {

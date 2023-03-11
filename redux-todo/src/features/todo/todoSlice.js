@@ -1,4 +1,15 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
+const api = "http://localhost:8000";
+
+export const fetchAll = createAsyncThunk(
+	'todo/fetchAll',
+	async () => {
+		const res = await fetch(`${api}/tasks`);
+		const list = await res.json();
+		return list;
+	}
+);
 
 export const todoSlice = createSlice({
 	name: "todo",
@@ -19,6 +30,11 @@ export const todoSlice = createSlice({
 			});
 		}
 	},
+	extraReducers: (builder) => {
+		builder.addCase(fetchAll.fulfilled, (state, action) => {
+			return action.payload;
+		});
+	}
 });
 
 export const selectTasks = state => state.todo.filter(item => item.done === false);

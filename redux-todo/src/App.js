@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
 	selectTasks,
@@ -7,6 +7,7 @@ import {
 	add,
 	del,
 	toggle,
+	fetchAll,
 } from "./features/todo/todoSlice";
 
 function AddNew() {
@@ -91,6 +92,12 @@ function DoneList() {
 }
 
 export default function App() {
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		dispatch(fetchAll());
+	}, []);
+
 	return (
 		<div>
 			<h1>Redux Todo</h1>

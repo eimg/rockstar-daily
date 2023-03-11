@@ -1,3 +1,7 @@
+import { useRouter } from "next/router";
+
+import { useEffect, useRef, useState } from "react";
+
 import {
 	Avatar,
 	Box,
@@ -19,75 +23,81 @@ import {
 	ChatBubbleOutline as ChatBubbleOutlineIcon,
 } from "@mui/icons-material";
 
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { getTweet, postComment } from "./apiCalls";
+import { getTweet, postComment } from "@/apiCalls";
 
-export default function Tweet({ tweets, updateTweets }) {
-	const { id } = useParams();
-
-	const navigate = useNavigate();
-	const [tweet, setTweet] = useState({});
-	const [loading, setLoading] = useState(true);
-
+export default function Tweet() {
 	const body = useRef();
+	const router = useRouter();
+	const { id } = router.query;
 
-	// const cache = useMemo(() => {
-	// 	const result = tweets.filter(t => t._id == id);
-	// 	return result[0];
-	// }, [id]);
-
+	const [tweet, setTweet] = useState({});
+	const [isLoading, setIsLoading] = useState(true);
 	useEffect(() => {
 		(async () => {
 			const result = await getTweet(id);
 			setTweet(result);
-			setLoading(false);
+			setIsLoading(false);
 		})();
-	}, []);
+	}, [id]);
 
 	return (
-		!loading && (
+		!isLoading && (
 			<Box sx={{ my: 3, mx: { lg: 20, md: 5, sm: 5, xs: 3 } }}>
 				<Card sx={{ mb: 2 }} key={tweet._id}>
-					<CardContent sx={{ display: "flex" }}>
-						<Avatar
-							alt="Profile"
-							sx={{
-								width: 80,
-								height: 80,
-								background: blue[600],
-							}}
-						/>
+					<CardContent
+						sx={{ display: "flex", alignItems: "flex-start" }}>
+						<IconButton
+							onClick={() => {
+								router.push(`/tweet/${tweet._id}`);
+							}}>
+							<Avatar
+								alt="Profile"
+								sx={{
+									width: 64,
+									height: 64,
+									background: blue[600],
+								}}
+							/>
+						</IconButton>
 						<Box sx={{ ml: 2, flexGrow: 1 }}>
 							<Box sx={{ display: "flex", mb: 1 }}>
-								<Typography
+								<CardActionArea
 									sx={{
-										fontWeight: "bold",
-										fontSize: "0.9em",
-									}}>
-									{tweet.owner_user[0].name}
-								</Typography>
-								<Typography
-									sx={{
-										fontSize: "0.8em",
-										ml: 1,
-										color: "grey",
-									}}>
-									@{tweet.owner_user[0].handle}
-								</Typography>
-								<Typography
-									sx={{
-										fontSize: "0.8em",
-										ml: 1,
-										color: blue[500],
-									}}>
-									{tweet.created}
-								</Typography>
+										display: "flex",
+										justifyContent: "flex-start",
+										flexWrap: "wrap",
+									}}
+									onClick={() => {}}>
+									<Typography
+										sx={{
+											fontWeight: "bold",
+											fontSize: "0.9em",
+										}}>
+										{tweet.owner_user &&
+											tweet.owner_user[0].name}
+									</Typography>
+									<Typography
+										sx={{
+											fontSize: "0.8em",
+											ml: 1,
+											color: "grey",
+										}}>
+										@
+										{tweet.owner_user &&
+											tweet.owner_user[0].handle}
+									</Typography>
+									<Typography
+										sx={{
+											fontSize: "0.8em",
+											ml: 1,
+											color: blue[500],
+										}}>
+										{tweet.created}
+									</Typography>
+								</CardActionArea>
 							</Box>
-							<CardActionArea>
-								<Typography sx={{ fontSize: "1.1em" }}>
-									{tweet.body}
-								</Typography>
+							<CardActionArea onClick={() => {}}>
+								{tweet.body}
 							</CardActionArea>
 							<Box
 								sx={{
@@ -96,13 +106,14 @@ export default function Tweet({ tweets, updateTweets }) {
 									mt: 2,
 								}}>
 								<ButtonGroup>
-									<IconButton>
+									<IconButton onClick={() => {}}>
 										<FavoriteBorderIcon
 											sx={{ color: pink[500] }}
 										/>
 									</IconButton>
-									<Button variant="clear">
-										{tweet.likes.length}
+
+									<Button variant="clear" onClick={() => {}}>
+										{tweet.likes && tweet.likes.length}
 									</Button>
 								</ButtonGroup>
 								<ButtonGroup>
@@ -112,7 +123,7 @@ export default function Tweet({ tweets, updateTweets }) {
 										/>
 									</IconButton>
 									<Button variant="clear">
-										{tweet.comments.length}
+										{tweet.comments && tweet.comments.length}
 									</Button>
 								</ButtonGroup>
 							</Box>
@@ -120,7 +131,7 @@ export default function Tweet({ tweets, updateTweets }) {
 					</CardContent>
 				</Card>
 
-				{tweet.comments.map(comment => {
+				{tweet.comments && tweet.comments.map(comment => {
 					return (
 						<Card sx={{ mb: 2 }} key={comment._id}>
 							<CardContent sx={{ display: "flex" }}>
@@ -159,7 +170,7 @@ export default function Tweet({ tweets, updateTweets }) {
 									</Box>
 									<CardActionArea
 										onClick={() => {
-											navigate(`/tweet/${comment._id}`);
+
 										}}>
 										{comment.body}
 									</CardActionArea>
@@ -217,7 +228,6 @@ export default function Tweet({ tweets, updateTweets }) {
 
 								const result = await getTweet(id);
 								setTweet(result);
-								updateTweets(result);
 							})();
 						}}>
 						<OutlinedInput

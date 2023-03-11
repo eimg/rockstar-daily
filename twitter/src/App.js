@@ -12,6 +12,7 @@ import Add from "./Add";
 import Likes from "./Likes";
 import Followers from "./Followers";
 import Following from "./Following";
+import Notis from "./Notis";
 
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
@@ -19,6 +20,8 @@ import { getTweets, verify } from "./apiCalls";
 
 import { Fab, Snackbar } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
+
+import { putLike, fetchNotis } from "./apiCalls";
 
 export default function App() {
 	const navigate = useNavigate();
@@ -32,10 +35,15 @@ export default function App() {
 
 	const [feedback, setFeedback] = useState(false);
 
+	const [notiCount, setNotiCount] = useState(0);
+
 	useEffect(() => {
 		(async () => {
 			const tweets = await getTweets();
 			setTweets(tweets);
+
+			const notis = await fetchNotis();
+			setNotiCount(notis.filter(n => !n.read).length);
 		})();
 	}, []);
 
@@ -75,11 +83,14 @@ export default function App() {
 	};
 
 	const toggleLike = id => {
+		putLike(id);
 		setTweets(
 			tweets.map(tweet => {
 				if (tweet._id === id) {
 					if (tweet.likes.find(n => n === authUser._id)) {
-						tweet.likes = tweet.likes.filter(n => n !== authUser._id);
+						tweet.likes = tweet.likes.filter(
+							n => n !== authUser._id,
+						);
 					} else {
 						tweet.likes = [authUser._id, ...tweet.likes];
 					}
@@ -92,7 +103,7 @@ export default function App() {
 
 	return (
 		<div>
-			<Header toggleDrawer={toggleDrawer} />
+			<Header toggleDrawer={toggleDrawer} notiCount={notiCount} />
 			<MainDrawer drawerState={drawerState} toggleDrawer={toggleDrawer} />
 			<Routes>
 				<Route
@@ -107,6 +118,10 @@ export default function App() {
 				<Route path="/likes" element={<Likes />} />
 				<Route path="/followers" element={<Followers />} />
 				<Route path="/following" element={<Following />} />
+				<Route
+					path="/notis"
+					element={<Notis setNotiCount={setNotiCount} />}
+				/>
 				<Route
 					path="/tweet/:id"
 					element={

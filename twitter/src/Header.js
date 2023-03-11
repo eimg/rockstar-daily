@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
+import Badge from "@mui/material/Badge";
 import MenuIcon from "@mui/icons-material/Menu";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -14,7 +15,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import Search from "./Search";
 
-export default function Header({toggleDrawer}) {
+export default function Header({toggleDrawer, notiCount}) {
 	const location = useLocation();
 	const navigate = useNavigate();
 
@@ -52,6 +53,7 @@ export default function Header({toggleDrawer}) {
 					</Typography>
 
 					<IconButton
+						color="inherit"
 						sx={{ mr: 1 }}
 						onClick={() => {
 							setSearchOpen(true);
@@ -62,9 +64,11 @@ export default function Header({toggleDrawer}) {
 					<IconButton
 						color="inherit"
 						onClick={() => {
-							// navigate("/notis");
+							navigate("/notis");
 						}}>
-						<NotificationsIcon />
+						<Badge badgeContent={notiCount} color="error">
+							<NotificationsIcon />
+						</Badge>
 					</IconButton>
 				</Toolbar>
 			</AppBar>
